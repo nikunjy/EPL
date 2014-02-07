@@ -45,3 +45,13 @@ int main() {
 
 As you see in this example, C++ can convert the integer because there is a constructor with integer argument. Explicit constructor stops the calling the constructor for implicit conversions. 
 
+###Copy Constructor 
+In C++ you operate in copies, copies are always allowed. So either delete the copy constructor or make a copy constructor that can do deep copy. If you want to avoid the problem of double delete. You can look at this in the String_first_version.cpp in this folder. Just turn on the DOUBLE_DELETE_PROBLEM macro. 
+
+###Assignment Operator 
+It should be pretty much same as the copy constructor. Keep in mind some things : 
+* Assignment operator should delete the object contained within and copy the argument 
+* Assignment operator should return a reference to the object because you can have cascading operators like a = b = c.  
+* Ofcourse you can decide between returning a value, a reference or a const reference for that matter. 
+* In assignment operator always check if (this == &that), because somebody can do X = X and you don't want to delete this and then copy that as written in the first point in that case.
+* Generally people make private methods copy(), destroy() and move() and just use them in copy constructors, move constructors, assignemnt operators. 
