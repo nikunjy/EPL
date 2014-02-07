@@ -47,6 +47,7 @@ As you see in this example, C++ can convert the integer because there is a const
 
 ###Copy Constructor 
 In C++ you operate in copies, copies are always allowed. So either delete the copy constructor or make a copy constructor that can do deep copy. If you want to avoid the problem of double delete. You can look at this in the String_first_version.cpp in this folder. Just turn on the DOUBLE_DELETE_PROBLEM macro. 
+There might be valid scenarios where you don't want the object to be copied at all, like file handlers, or threads. In that case you have to declare the copy constructor or the assignment operator as deleted. Notice the source Stirng_first_version.cpp and follow the use of the macro COPY_DISABLED
 
 ###Assignment Operator 
 It should be pretty much same as the copy constructor. Keep in mind some things : 

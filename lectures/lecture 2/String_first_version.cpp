@@ -6,7 +6,7 @@
    2. How to do a deep copy. Always make the following private methods : destroy() copy() and move(). Look at the copy constructor. 
    3. Assignment operator, always delete yourself first and then copy over what was passed to you.
    4. Notice that the constructor with the single argument is declared as explicit.
-
+   5. You can disable copy constructor, just define the macro COPY_DISABLED
 */
 #include <iostream>
 #include <stdio.h>
@@ -38,6 +38,13 @@ class String {
  		data = new char[len+1];	
  		strcpy(data,_data);
  	}
+ #ifdef COPY_DISABLED
+
+ 	String(const String&that) = delete;
+ 	String& operator=(String &that) =  delete;
+
+ #else 
+
  	String (const String &that) { 
  	  #ifdef DOUBLE_DELETE_PROBLEM
  		this->data = that.data; 
@@ -47,6 +54,7 @@ class String {
  	  #endif
  	}
  	String& operator=(String &that) { 
+ 		cout<<"\nAssignment operator"<<endl;
  		/*
  			Destroy myself and copy that.
  		*/
@@ -56,6 +64,8 @@ class String {
  		}
  		return *this;
  	}
+
+ #endif
  	friend ostream &operator<<( ostream &output, const String &obj) {
  		output << obj.data << "\n";
  	}
@@ -70,6 +80,7 @@ void function(String s) {
 int main() { 
 	String s("hello"); 
 	function(s);
-	String x = s; 
+	String x; 
+	x = s; 
 	cout << x;
 }
