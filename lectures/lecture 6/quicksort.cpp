@@ -11,12 +11,15 @@ int distance(Ptr a, Ptr b) {
 	}
 	return count;
 }
-template <typename Ptr> 
-Ptr partition(Ptr b, Ptr e) {
+template <typename Ptr, typename CompType> 
+Ptr partition(Ptr b, Ptr e, CompType comp) {
+	if ( b == e) { 
+		return b;
+	}
 	Ptr x = b + 1; 
 	Ptr p = b; 
 	while (x != e) {
-		if (*x < *b) {
+		if (comp(*x,*b)) {
 			p++;
 			swap(*p, *x);
 		}
@@ -32,19 +35,54 @@ void print(Ptr b, Ptr e) {
 	}
 	cout << endl;
 }
+template <typename T>
+struct DefaultComp { 
+	bool operator()(T a, T b) { 
+		return a < b;
+	}
+};
+template <typename It>
+struct iterator_traits { 
+	using value_type = typename It::value_type;
+};
+template <typename T>
+struct iterator_traits<T*> { 
+	using value_type = T;
+};
+
+template <typename Ptr, typename CompType> 
+void sort(Ptr b, Ptr e, CompType comp) { 
+	if ( epl::distance(b,e) < 2) { 
+		return;
+	}
+	Ptr pivot = partition(b, e, comp); 
+	sort(b, pivot, comp); 
+	sort(pivot + 1, e, comp);
+}
+
 template <typename Ptr> 
 void sort(Ptr b, Ptr e) { 
 	if ( epl::distance(b,e) < 2) { 
 		return;
 	}
-	Ptr pivot = partition(b, e); 
+	using T = typename iterator_traits<Ptr>::value_type;
+	Ptr pivot = partition(b, e, DefaultComp<T>()); 
 	sort(b, pivot); 
 	sort(pivot + 1, e);
 }
 }
-
+struct IntComparison { 
+	bool operator()(int a, int b) { 
+		return a < b;
+	}
+};
 int main() { 
 	vector<int> v = { 1 , 4, 10, -1, 2, 5, 8, 9};
+	int x[8] = { 1 , 4, 10, -1, 2, 5, 8, 9};
 	epl::sort(v.begin(), v.end()); 
 	epl::print(v.begin(), v.end());
+
+	epl::sort(&(x[0]), &(x[8])); 
+	epl::print(&(x[0]), &(x[8])); 
+
 }
