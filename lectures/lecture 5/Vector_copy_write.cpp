@@ -8,6 +8,12 @@
 		3. I also learnt that even though an object might be passed as a r value to a function f, if function f calls g which also accepts r value. This will not work 
 		   You will have to explicitly call g with std::move(obj) as the argument. 
 		___________________________________________________________________________________________________________________________________________________ 
+	We are in the mysterious dark land of C++ now, we have the operator [] which returns a reference which could potentially be used to changed the value in the vector.
+	We have two variations of [] one which returns a const reference and one which returns a reference. C++ is dumb enough to not be able to understand the difference between 
+	x[3] = 4; and cout << x[3]; 
+	Therefore we do what we always do, we HACK! and call ourselves a hacker :D
+	Look at the code where we declare struct Proxy {}
+
 
 
 */
@@ -33,6 +39,11 @@ public:
 	}
 	Foo(Foo &&obj) { 
 		this->data = obj.data;
+	}
+	Foo& operator=(const Foo& that) { 
+		this->data = that.data; 
+		copies += 1;
+		return *this;
 	}
 };
 int Foo::constructions = 0; 
@@ -104,9 +115,15 @@ private:
 		int size() const { 
 			return end - start;
 		}
-		const T& operator[](int k) { 
+		const T& operator[](int k) const { 
 			if ( k < end - start) { 
 				return data[k + start];
+			}
+			throw std::out_of_range("out of range index");
+		}
+		T& operator[](int k) { 
+			if ( k < end - start) { 
+				return data[k + start]; 
 			}
 			throw std::out_of_range("out of range index");
 		}
@@ -166,12 +183,36 @@ public:
 	const Vector& operator=(Vector<T> &&that) {
 		move(that);
 	}
-	T& operator[](int k) { 
-		force_unique(); 
-		return core[k];
+	struct Proxy {
+		Vector<T> *me; 
+		int k;
+		Proxy& operator=(const T& x) {
+			me->at(k) = x; 
+			return *this;
+		}
+		Proxy& operator=(T& x) {
+			me->at(k) = x; 
+			return *this;
+		}
+		operator T(void) {
+			const_cast<const Vector<T>*>(me)->at(k);
+		}
+	};
+	Proxy operator[](int k) { 
+		Proxy prox { this, k};
+		return prox;
+	}
+	T& at(int k) { 
+		force_unique();
+		Core &temp(*core);
+		return temp[k];
+	}
+	const T& at(int k) const {
+		 const Core &temp(*core);
+		 return temp[k];
 	}
 	const T& operator[](int k) const {
-		return core[k];
+		return at(k);
 	}
 	int size() const { 
 		return core->size();
@@ -191,19 +232,24 @@ public:
 
 };
 int main() { 
-	Vector<Foo> v;
-	for (int i = 0; i < 10; i++) { 
-		v.push_back(Foo());
-	}
-	assert(Foo::constructions == 10); 
-	assert(Foo::destructions == 0);
-	Vector<Foo> x;
-	x = v;
-	assert(Foo::constructions == 10); 
-	assert(Foo::destructions == 0);
-	Vector<Foo> y(v); 
-	assert(Foo::constructions == 10 && Foo::destructions == 0);
-	y.push_back(Foo());
-	assert(Foo::constructions == 11 && Foo::copies == 10 && Foo::destructions == 0);
-	cout << "Test Passed";
+		Vector<Foo> v;
+		for (int i = 0; i < 10; i++) { 
+			v.push_back(Foo());
+		}
+		assert(Foo::constructions == 10); 
+		assert(Foo::destructions == 0);
+		Vector<Foo> x;
+		x = v;
+		assert(Foo::constructions == 10); 
+		assert(Foo::destructions == 0);
+		Vector<Foo> y(v); 
+		assert(Foo::constructions == 10 && Foo::destructions == 0);
+		y.push_back(Foo());
+		assert(Foo::constructions == 11 && Foo::copies == 10 && Foo::destructions == 0);
+		x[9];
+		assert(Foo::constructions == 11 && Foo::copies == 10 && Foo::destructions == 0);
+		x[9] = x[8]; // THIS DOES NOT WORK WTF!! 
+		x[9] = Foo(); // THIS WORKS
+		assert(Foo::constructions == 12 && Foo::copies == 21 && Foo::destructions == 0);
+		cout << "Test Passed" << endl;
 }
