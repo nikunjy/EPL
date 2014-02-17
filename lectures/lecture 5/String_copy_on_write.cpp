@@ -1,3 +1,11 @@
+/*
+	Author: Nikunj Yadav <nikunj@cs.utexas.edu>  
+	This file contains the following thigs: 
+	 	1. This has the copy on write implementation for String. We have till now demonstrated deep copy and move. 
+	 	2. Here a an object maintains the reference counter which keeps of track of how many objects are sharing the main "core". 
+	 	3. This will obviously not have any problem of double delete because the destructor is written so that it only deletes when the object is the only thing containing the core.  
+	 	4. For every construction shallow copy is being done and deep copy done on any writes.
+*/
 #include <iostream>
 #include <string.h>
 #include <stdio.h>
