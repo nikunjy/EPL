@@ -23,6 +23,8 @@ public:
 	 private:
 		Node *ptr; 
 	 public:
+	 	using value_type = T; 
+	 	using iterator_category = std::forward_iterator_tag;
 		iterator(Node *data) { 
 			ptr = data;
 		}
