@@ -24,18 +24,16 @@ T1 max(T1 x, T2 y) {
 }
 
 This will not compile because your if block is returning T2 in one condition and T1. Let's fix this
+If you put constexpr you say that it is compile time const expression.  
+But putting const in front of something means that it is const whenever it is assigned rather than at compile time. 
 */
 template <typename T>
 constexpr T max(T x, T y) { 
-	if ( x > y) { 
-		return x;
-	} else {
-		return y;
-	}
+	return (x < y) ? y : x; 
 }
 template <typename T1, typename T2>  
 struct choose; //template doesn't have to exist it just needs to be declared.  
-
+//One implementation of this could be 
 template<> struct choose<int, int>  { using type  = int; };
 template<> struct choose<float, int>  { using type  = float; };
 template<> struct choose<double, int>  { using type  = double; };
