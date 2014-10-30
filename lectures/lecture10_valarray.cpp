@@ -17,4 +17,4 @@ int main() {
 	Valarray<double> x(10); 
 	Valarray<double> y(10); 
 	cout << x + y;
-}
+}ar
